@@ -9,3 +9,5 @@ Includes:
 
 Todo:
 - tar & gzip only specified remote files/directories and be able to restore them later
+- mysql database copy from `Server A` to `Server B` (through SSH and directly)
+- FTP backup to tar & gzip
