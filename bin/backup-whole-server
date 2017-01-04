@@ -1,0 +1,3 @@
+#!/bin/bash
+
+eval "sshpass -p$PASSWORD ssh -p $PORT -o StrictHostKeyChecking=no $USER@$HOST $TAR_COMMAND" > $DESTINATION_FILE

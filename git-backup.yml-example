@@ -1,0 +1,13 @@
+repositories:
+
+    file_repository:
+        from: https://github.com/Wolnosciowiec/image-repository
+        dest: git@localgit/Wolnoscioiec/image-repository
+        branches:
+            - master
+
+    testing_valid_entry:
+        from: git@github.com:Wolnosciowiec/image-repository.git
+        dest: git@github.com:Wolnosciowiec/image-repository.git
+        branches:
+            - master
