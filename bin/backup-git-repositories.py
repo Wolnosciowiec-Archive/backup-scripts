@@ -13,10 +13,20 @@ import WolnosciowiecBackup.BaseBackupApplication
 from WolnosciowiecBackup.NonZeroExitCodeException import NonZeroExitCodeException
 
 class BackupGitRepositories (WolnosciowiecBackup.BaseBackupApplication):
+
+    def get_repositories_path(self):
+        """
+           Path where the repositories are cloned
+        """
+
+        return self.get_setting_value('repositories_path', '/tmp')
+
+    def should_keep_repositories(self):
+        return self.get_setting_value('repositories_keep', False)
     
     def git_clone(self, url, destination_path):
         self.log('Clonning the repository')
-        self.execute_command("cd /tmp && git clone " + url + " " + destination_path)
+        self.execute_command("cd " + self.get_repositories_path() + " && git clone " + url + " " + destination_path)
         
     def git_add_origin(self, path, destination_url):
         self.log('Adding backup origin')
@@ -28,6 +38,9 @@ class BackupGitRepositories (WolnosciowiecBackup.BaseBackupApplication):
         self.execute_command("cd " + path + " && git push -u backup " + branch_name)
         
     def cleanup(self, repository_path):
+        if self.should_keep_repositories():
+            return False
+
         if os.path.isdir(repository_path):
             self.execute_command("rm -rf " + repository_path)
         

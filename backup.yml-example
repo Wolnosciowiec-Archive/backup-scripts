@@ -1,6 +1,8 @@
 settings:
     max_mysql_backups_count: 5
     mysql_backups_dir: "./backups"
+    repositories_keep: false
+    repositories_path: "/tmp"
 
 repositories:
 
