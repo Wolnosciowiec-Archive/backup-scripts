@@ -1,0 +1,47 @@
+- name: Creates directory
+  become: yes
+  file: path=/app state=directory owner=root group=root mode=0750
+  tags:
+      - backup_server
+
+- name: Copy files to remote
+  become: yes
+  copy:
+      follow: yes
+      force: yes
+      group: root
+      owner: root
+      mode: "go+r,u+rwx"
+      directory_mode: yes
+      src: ../../../../../
+      dest: /app/backup
+  tags:
+      - backup_server
+
+- name: Add the configuration file
+  become: yes
+  template: src=backup.yml dest=/app/backup/backup.yml
+  tags:
+      - backup_server
+
+- name: Add a scheduled task for MySQL backup
+  become: yes
+  cron:
+      name: "backup_mysql_server_daily"
+      minute: "0"
+      hour: "22"
+      job: "cd /app/backup && ./bin/backup-mysql-servers.py"
+      day: "*"
+  tags:
+      - backup_server_mysql
+
+- name: Add a scheduled task for GIT backup
+  become: yes
+  cron:
+      name: "backup_git_server_every_hour"
+      minute: "0"
+      hour: "*"
+      job: "cd /app/backup && ./bin/backup-git-repositories.py"
+      day: "*"
+  tags:
+      - backup_server_git

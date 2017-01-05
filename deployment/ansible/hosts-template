@@ -1,0 +1,2 @@
+[my_host]
+my-host ansible_ssh_user=root

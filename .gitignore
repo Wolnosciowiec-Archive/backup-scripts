@@ -1,3 +1,5 @@
-backup.yml
-.ENV
-backups/*
+/backup.yml
+/.ENV
+/deployment/ansible/hosts-template
+/deployment/ansible/roles/backup-server/templates/backup.yml
+/backups/*
