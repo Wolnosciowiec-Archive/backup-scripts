@@ -1,0 +1,1 @@
+from WolnosciowiecBackup.BaseBackupApplication import BaseBackupApplication

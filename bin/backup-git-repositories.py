@@ -4,27 +4,16 @@ import yaml
 import os
 import sys
 
-class NonZeroExitCodeException (Exception):
-    """ Exception that will be used in whole simple class """
+t = sys.argv[0].replace(os.path.basename(sys.argv[0]), "") + "/../lib/"
 
-class BackupGitRepositories:
+if os.path.isdir(t):
+    sys.path.append(t)
+
+import WolnosciowiecBackup.BaseBackupApplication
+from WolnosciowiecBackup.NonZeroExitCodeException import NonZeroExitCodeException
+
+class BackupGitRepositories (WolnosciowiecBackup.BaseBackupApplication):
     
-    configuration = []
-    
-    def read_configuration(self):
-        self.configuration = yaml.load(open(os.path.dirname(__file__) + "/../git-backup.yml", "r"))
-        
-    def log(self, output):
-        print(" >> " + output)
-        
-    def execute_command(self, command):
-        """ Execute a command with exit status verification """
-        
-        if os.system(command) != 0:
-            self.log('ERROR: Command "' + command + '" returned with a non-zero exit code')
-            raise NonZeroExitCodeException('Non-zero exit code')
-            
-        
     def git_clone(self, url, destination_path):
         self.log('Clonning the repository')
         self.execute_command("cd /tmp && git clone " + url + " " + destination_path)
