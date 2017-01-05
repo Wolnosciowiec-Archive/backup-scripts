@@ -1,3 +1,7 @@
+settings:
+    max_mysql_backups_count: 5
+    mysql_backups_dir: "./backups"
+
 repositories:
 
     file_repository:
@@ -11,3 +15,21 @@ repositories:
         dest: git@github.com:Wolnosciowiec/image-repository.git
         branches:
             - master
+
+mysql_servers:
+    production_server:
+        mysql_host: localhost
+        mysql_port: 3306
+        mysql_user: root
+        mysql_pass: xxx
+        mysql_database: xxx
+
+        # ssh is optional
+        ssh: true
+        ssh_user: xxxx
+        ssh_pass: xxxx
+        ssh_host: xxxx
+        ssh_port: 22
+
+        # optional (for example if docker is used. %s is replaced with a mysqldump and ssh if used)
+        command_wrapping: "cd /app && sudo docker-compose exec database %s"

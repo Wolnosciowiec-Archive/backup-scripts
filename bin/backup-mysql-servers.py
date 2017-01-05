@@ -3,6 +3,7 @@
 import yaml
 import os
 import sys
+from datetime import datetime
 
 t = sys.argv[0].replace(os.path.basename(sys.argv[0]), "") + "/../lib/"
 
@@ -75,8 +76,61 @@ class BackupMySQLServers (WolnosciowiecBackup.BaseBackupApplication):
             command += '"'
             
         return command
- 
- 
+    
+    
+    def get_backup_file_name(self, server_name):
+        """ 
+           Returns a file name for backup file
+        """
+        
+        return datetime.now().strftime('%Y-%m-%d-%H_%M-_' + server_name) + '.sql'
+    
+    def do_cleanup(self):
+        """
+           Remove old backups
+        """
+        
+        if not self.get_setting_value('max_mysql_backups_count'):
+            self.log('settings/max_mysql_backups_count not defined, skipping clean up')
+            return True
+        
+        maxAmount = int(self.get_setting_value('max_mysql_backups_count'))
+        files     = {}
+        
+        if maxAmount < 1:
+            self.log('settings/max_mysql_backups_count is lower than 1, it should not be')
+            return False
+
+        self.log('Looking for old backups to clean up')
+
+        for entry in os.scandir(self.get_backups_dir()):
+            if entry.name.endswith('.sql') and entry.is_file():
+                parts = entry.name.split('-_')
+
+                if not parts[1] in files:
+                    files[parts[1]] = []
+
+                files[parts[1]].append(entry.name)
+
+        for type_name, data in files.items():
+            data.sort()
+            data.reverse()
+            num = 0
+
+            for file in data:
+                num = num + 1
+
+                if num > maxAmount:
+                    self.log('Removing file "' + file + '"')
+                    os.remove(self.get_backups_dir() + '/' + file)
+
+    def get_backups_dir(self):
+        """
+           Directory where to place backups
+        """
+
+        return self.get_setting_value('mysql_backups_dir', './backups')
+
     def do_backup(self):
         """
            Main action, a controller
@@ -90,10 +144,11 @@ class BackupMySQLServers (WolnosciowiecBackup.BaseBackupApplication):
             self.log('Running backup of "' + server_name + '"')
 
             server_details = self.correct_node(server_name)
-            command        = self.create_command(server_name) + ' > ./backups/' + server_name + '.sql'
+            command        = self.create_command(server_name) + ' > ' + self.get_backups_dir() + '/' + self.get_backup_file_name(server_name)
 
             self.execute_command(command)
             
 app = BackupMySQLServers()
 app.read_configuration()
 app.do_backup()
+app.do_cleanup()
